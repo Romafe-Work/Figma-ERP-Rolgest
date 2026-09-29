@@ -87,9 +87,6 @@
     'cartao': 'Cartão de sessão', 'cartao__cabeca': 'Cabeça do cartão',
     'formulario': 'Formulário', 'campo': 'Campo', 'opcao': 'Caixa de verificação',
     'btn': 'Botão', 'apoio': 'Apoio', 'rodape': 'Rodapé', 'alerta': 'Alerta',
-    /* As três recusas do §5 têm nome próprio na lista de camadas: são a
-       mesma peça, e é preciso saber qual se está a mostrar. */
-    'alerta--licenca': 'Alerta · licença', 'alerta--permissao': 'Alerta · permissão',
     'separador': 'Separador', 'segmented': 'Segmentado', 'input': 'Caixa de texto',
     'aba': 'Aba', 'paineis': 'Painéis', 'painel': 'Painel',
     'painel__cabeca': 'Cabeça do painel', 'painel__corpo': 'Corpo do painel',
