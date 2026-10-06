@@ -1,6 +1,6 @@
 # ROLGEST — os ecrãs e o fluxo
 
-Os ecrãs do ERP que substitui o Delphi — 13, em quatro fluxos —, desenhados
+Os ecrãs do ERP que substitui o Delphi — 23, em sete fluxos —, desenhados
 com os tokens do [manual de UI da Romafe](https://romafe-work.github.io/UIUX/),
 uma tela para os editar e o mapa de navegação entre eles.
 

@@ -1,13 +1,13 @@
 /* =========================================================
    ROLGEST — comportamento do ecrã de entrada
-   Regras de 19: mostrar/ocultar, uma mensagem só de erro,
-   a palavra-passe limpa-se e o utilizador fica.
+   Em dois passos: o endereço no 01, a palavra-passe no 01b.
+   Regras de 19 no 01b: mostrar/ocultar, uma mensagem só de erro,
+   a palavra-passe limpa-se.
    ========================================================= */
 (function () {
   'use strict';
 
-  var form    = document.getElementById('formulario');
-  var quem    = document.getElementById('utilizador');
+  var form    = document.getElementById('formulario-passe');
   var passe   = document.getElementById('palavra-passe');
   var olho    = document.getElementById('ver-palavra-passe');
   var alerta  = document.getElementById('alerta');
@@ -25,29 +25,24 @@
 
   /* --- erro de credenciais (19 §3) ---
      A mensagem é sempre a mesma, esteja a conta errada, desativada ou
-     inexistente. Dizer qual falhou confirma a quem tenta que o utilizador existe. */
+     inexistente. Dizer qual falhou confirma a quem tenta que o endereço existe. */
   function falhar() {
     alerta.hidden = false;
     passe.value = '';        // a palavra-passe limpa-se
     passe.focus();           // o foco vai para onde se vai escrever
   }
 
-  function limparAlerta() {
-    alerta.hidden = true;
-  }
-
-  quem.addEventListener('input', limparAlerta);
-  passe.addEventListener('input', limparAlerta);
+  passe.addEventListener('input', function () { alerta.hidden = true; });
 
   form.addEventListener('submit', function (ev) {
     ev.preventDefault();
 
-    if (!quem.value.trim() || !passe.value) { falhar(); return; }
+    if (!passe.value) { falhar(); return; }
 
     entrar.disabled = true;
     rotulo.textContent = 'A entrar…';
 
-    // Demonstração: aqui entraria o pedido ao servidor.
+    // Demonstração: aqui entraria o pedido ao Keycloak.
     window.setTimeout(function () {
       entrar.disabled = false;
       rotulo.textContent = 'Entrar';

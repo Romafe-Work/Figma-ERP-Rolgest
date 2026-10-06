@@ -28,5 +28,5 @@ for e in $(grep -o 'data-ecra="[^"]*"' "$INDEX" | cut -d'"' -f2); do
   echo "$f"
 done
 
-correr --window-size=2600,2000 --screenshot="$PWD/00-fluxo.png" "file://$INDEX#so=fluxo"
+correr --window-size=2600,3500 --screenshot="$PWD/00-fluxo.png" "file://$INDEX#so=fluxo"
 echo 00-fluxo

@@ -101,6 +101,9 @@ select.input { accent-color: var(--c-marca-fundo); }
   color: var(--c-texto-2); cursor: pointer;
 }
 .campo__acao:hover { background: var(--c-superficie-3); }
+/* Com rótulo por cima, o meio do .campo já não é o meio da caixa: desce
+   metade da altura do rótulo (a linha de --t-sm mais a folga de --e-1). */
+.campo__label ~ .campo__icone, .campo__label ~ .campo__acao { top: calc(50% + 13px); }
 .campo__acao svg { width: 18px; height: 18px; }
 
 /* ---------- opção (caixa de verificação) ---------- */

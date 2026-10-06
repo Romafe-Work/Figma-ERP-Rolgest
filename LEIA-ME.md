@@ -1,8 +1,8 @@
 # ROLGEST — os ecrãs e o fluxo
 
 Os ecrãs da plataforma que substitui o ERP em Delphi, desenhados numa tela
-como a do `Figma-PDA-Armazem`: o mesmo editor, apontado ao ERP. São 13, em
-quatro fluxos, e o mapa de navegação desenha as setas entre eles.
+como a do `Figma-PDA-Armazem`: o mesmo editor, apontado ao ERP. São 27, em
+sete fluxos, e o mapa de navegação desenha as setas entre eles.
 
 | Ficheiro | Para quê |
 | --- | --- |
@@ -15,13 +15,18 @@ quatro fluxos, e o mapa de navegação desenha as setas entre eles.
 
 | Fluxo | Ecrãs | O que decide |
 | --- | --- | --- |
-| Entrar | 01 Entrar → 02 Escolher a empresa · 03 Aplicação fora do contrato | Primeiro quem é a pessoa, depois a empresa. Com uma só empresa, o 02 salta-se. O 03 é a recusa à porta de v10 §4.11, com código para o apoio |
+| Entrar | 01 Entrar → 01b A palavra-passe → 01c O código da aplicação → 02 Escolher a empresa · 01 → 01d O início de sessão da empresa → 02 · 03 Aplicação fora do contrato | Em dois passos: primeiro o endereço, e o domínio decide o caminho — conta nossa (palavra-passe no Keycloak, realm rolgest) ou cliente federado (a página do fornecedor dele, por exemplo o Entra ID). Os ecrãs 01 a 01c são páginas do Keycloak com o tema Rolgest; a aplicação só redireciona. O 01c é proposta: segundo fator também na conta nossa. Com uma só empresa, o 02 salta-se. O 03 é a recusa à porta de v10 §4.11, com código para o apoio |
 | Trabalhar numa empresa | 04 Início → 05 O menu de Vendas → 06 Encomendas de clientes → 07 Uma encomenda · 08 Sem ligação | A casca de v10 §6.9: os quinze menus de topo com a grafia antiga, separadores, e a empresa sempre à vista (na barra e no rodapé) |
 | Trocar de empresa | 07 → 09 Trocar de empresa → 10 Depois da troca | Troca-se sem sair; fecha tudo o que estava aberto e diz antes o que se perde (v10 §4.16) |
-| Dar acesso a uma pessoa | 04 → 11 Pessoas e lugares → 12 Dar lugares → 13 Permissões por empresa | Primeiro o lugar, depois as permissões, como um percurso (v10 §4.21). Um módulo cheio recusa no 12 |
+| Lugares e permissões | 04 → 11 Pessoas e lugares → 12 Dar lugares → 13 Permissões por empresa · 11 → 20 Retirar um lugar | Primeiro o lugar, depois as permissões, como um percurso (v10 §4.21). Um módulo cheio recusa no 12. Retirar liberta o lugar logo e guarda as permissões (§4.10) |
+| Procurar, criar e gravar | 04 → 14 Procurar · 06 → 15 Nova encomenda · 16 Alguém gravou primeiro · 04 → 17 Notificações | Ctrl K abre qualquer ecrã ou documento da empresa ativa. Criar diz o que falta ao gravar. Quem grava em segundo não apaga o primeiro (§5.5) |
+| Quando a sessão ou a licença acabam | 18 A sessão terminou · 19 Licença em leitura | Volta-se a entrar sem perder os separadores. Em leitura consulta-se e exporta-se, não se grava (§4.9) |
+| A licença e o apoio | 21 A licença está a acabar → 22 A licença · 21 → 23 Acesso do apoio | O aviso dos 30 dias só aparece a quem administra. O apoio entra só com aprovação, por tempo contado (§5.8) |
 
-O 03 e o 08 não têm seta a entrar: são estados (a licença recusou, a rede
-caiu), e não um sítio aonde se vá por um botão.
+O 03, o 08, o 16, o 18 e o 19 não têm seta a entrar: são estados (a licença
+recusou, a rede caiu, outra pessoa gravou, a sessão expirou, a licença
+acabou), e não um sítio aonde se vá por um botão. O 21 é o Início de quem
+administra.
 
 ## Como se mexe
 
@@ -54,8 +59,8 @@ web/
   como-funciona.html          o que isto é e porque não é o Figma
   assets/css/tokens.css       os valores do manual de UI da Romafe, sem alterar
   assets/css/base.css         botão, campo, opção, segmentado, marca
-  assets/css/entrada.css      o palco com fotografia: 01, 02 e 03
-  assets/css/casca.css        a aplicação por dentro: 04 a 13
+  assets/css/entrada.css      o palco com fotografia: 01 a 01d, 02 e 03
+  assets/css/casca.css        a aplicação por dentro: 04 a 23
   assets/css/editor.css       a moldura do editor e o mapa
   assets/js/tema.js           claro, escuro, auto — a chave é 'uiux:tema'
   assets/js/entrada.js        mostrar/ocultar, e a recusa de credenciais

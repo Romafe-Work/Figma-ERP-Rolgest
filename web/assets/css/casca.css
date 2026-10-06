@@ -472,6 +472,84 @@
 /* Ícone dentro de um botão pequeno ou fantasma */
 .btn svg { width: 16px; height: 16px; flex: none; }
 
+/* =========================================================
+   14 a 23
+   ========================================================= */
+
+/* ---------- procurar (Ctrl K) ----------
+   Abre em cima, e não ao centro: os resultados crescem para baixo sem a
+   janela saltar a cada letra. */
+.casca__veu--topo { place-items: start center; padding-top: 96px; }
+.paleta { width: 640px; border-radius: var(--r-lg); background: var(--c-superficie); box-shadow: var(--s-3); overflow: hidden; }
+.paleta__campo { display: flex; align-items: center; gap: var(--e-3); padding: var(--e-4) var(--e-5); border-bottom: 1px solid var(--c-borda); }
+.paleta__campo svg { width: 20px; height: 20px; color: var(--c-texto-3); flex: none; }
+.paleta__texto { flex: 1; margin: 0; font-size: var(--t-lg); }
+.paleta__cursor { display: inline-block; width: 2px; height: 1.1em; margin-left: 1px; vertical-align: text-bottom; background: var(--c-marca); }
+.paleta__corpo { padding: var(--e-2) var(--e-3) var(--e-3); }
+.resultado { display: flex; align-items: center; gap: var(--e-3); padding: var(--e-2); border-radius: var(--r-md); cursor: pointer; }
+.resultado.is-marcado { background: var(--c-marca-suave); }
+.resultado--por-converter { opacity: .6; cursor: default; }
+.resultado .kbd, .resultado .selo { margin-left: auto; }
+.paleta__pe { display: flex; align-items: center; gap: var(--e-4); padding: var(--e-2) var(--e-5); border-top: 1px solid var(--c-borda); background: var(--c-superficie-2); font-size: var(--t-xs); color: var(--c-texto-2); }
+.paleta__onde { margin-left: auto; }
+
+/* ---------- janelas de outros tamanhos ---------- */
+.janela--larga { width: 640px; }
+.janela--estreita { width: 420px; }
+.tabela--compara td:nth-child(2) { background: var(--c-acao-suave); }
+.tabela--compara td:nth-child(3) { background: var(--c-ok-suave); }
+.tabela--compara tbody tr { cursor: default; }
+.recusa__icone--info { background: var(--c-marca-suave); color: var(--c-marca); margin-bottom: 0; }
+
+.factos { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--e-3); }
+.factos li { display: flex; gap: var(--e-3); align-items: flex-start; font-size: var(--t-sm); }
+.factos svg { width: 18px; height: 18px; flex: none; margin-top: 2px; color: var(--c-marca); }
+
+/* ---------- o painel das notificações (13 §5) ----------
+   Pendurado no sino, por cima do conteúdo, sem véu: é uma espreitadela. */
+.notificacoes {
+  position: absolute; top: 56px; right: 150px; z-index: 20; width: 400px;
+  background: var(--c-superficie); border: 1px solid var(--c-borda); border-radius: var(--r-lg); box-shadow: var(--s-3);
+}
+.notificacoes__cabeca { display: flex; align-items: center; justify-content: space-between; padding: var(--e-3) var(--e-4); border-bottom: 1px solid var(--c-borda); }
+.notificacoes__lista { list-style: none; margin: 0; padding: var(--e-1) 0; }
+.notif { position: relative; display: flex; gap: var(--e-3); align-items: flex-start; padding: var(--e-3) var(--e-4); cursor: pointer; }
+.notif:hover { background: var(--c-superficie-2); }
+.notif.is-nova::after { content: ""; position: absolute; right: var(--e-4); top: 20px; width: 8px; height: 8px; border-radius: var(--r-full); background: var(--c-marca); }
+.notif__icone { width: 32px; height: 32px; flex: none; display: grid; place-items: center; border-radius: var(--r-full); background: var(--c-superficie-3); color: var(--c-texto-2); }
+.notif__icone svg { width: 16px; height: 16px; }
+.notif__icone--ok { background: var(--c-ok-suave); color: var(--c-ok); }
+.notif__icone--info { background: var(--c-marca-suave); color: var(--c-marca); }
+.notificacoes__pe { margin: 0; padding: var(--e-3) var(--e-4); border-top: 1px solid var(--c-borda); font-size: var(--t-xs); color: var(--c-texto-2); }
+
+/* ---------- criar: o campo que falta ---------- */
+.ficha__campo--erro .ficha__valor { border-color: var(--c-erro); }
+.ficha__valor--vazio { color: var(--c-texto-3); }
+.linha-nova td { background: var(--c-superficie-2); cursor: text; }
+.linha-nova__texto { display: inline-flex; align-items: center; gap: var(--e-2); color: var(--c-texto-3); }
+.linha-nova__texto svg { width: 16px; height: 16px; }
+
+/* ---------- a licença: as cinco etapas ---------- */
+.etapas { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.etapa { position: relative; padding-top: 22px; padding-right: var(--e-3); }
+.etapa::before { content: ""; position: absolute; top: 6px; left: 0; right: 0; height: 2px; background: var(--c-borda-forte); }
+.etapa__ponto { position: absolute; top: 0; left: 0; width: 14px; height: 14px; border-radius: var(--r-full); background: var(--c-superficie); border: 2px solid var(--c-borda-forte); }
+.etapa.is-feito::before, .etapa.is-feito .etapa__ponto { background: var(--c-ok); border-color: var(--c-ok); }
+.etapa.is-atual .etapa__ponto { background: var(--c-aviso); border-color: var(--c-aviso); box-shadow: 0 0 0 4px var(--c-aviso-suave); }
+.etapa__nome { margin: 0; font-weight: 700; }
+.etapa.is-atual .etapa__nome { color: var(--c-aviso); }
+.etapa__quando { margin: 0; font-size: var(--t-xs); color: var(--c-texto-2); }
+
+.datas { display: grid; grid-template-columns: 180px 1fr; gap: var(--e-2) var(--e-4); margin: 0; padding: var(--e-4); font-size: var(--t-sm); }
+.datas dt { color: var(--c-texto-2); }
+.datas dd { margin: 0; }
+.datas--linha { grid-template-columns: 140px 1fr; padding: 0 var(--e-4) var(--e-4) 64px; }
+
+/* ---------- o pedido do apoio ---------- */
+.pedido { border-color: var(--c-acao); }
+.pedido__cabeca { display: flex; align-items: center; gap: var(--e-3); padding: var(--e-4); }
+.pedido__accoes { display: flex; justify-content: flex-end; gap: var(--e-2); padding: var(--e-3) var(--e-4); border-top: 1px solid var(--c-borda); }
+
 @media print {
   .casca { height: 900px; }
 }
