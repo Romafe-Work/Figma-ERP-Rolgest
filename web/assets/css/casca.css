@@ -1,0 +1,477 @@
+/* =========================================================
+   ROLGEST — a casca da aplicação de gestão
+   O que v10 §6.9 põe no Rolgest.Desktop.Core: a janela principal, os
+   separadores, a escolha da empresa e a barra de estado do rodapé.
+   Medidas do manual, capítulo 06 (menu) e 05 (layout). Nenhuma cor nova.
+   ========================================================= */
+
+/* ---------- o esqueleto ----------
+   Coluna do menu à esquerda, e à direita três faixas: a barra superior,
+   os separadores e a área do documento. A barra de estado atravessa a
+   janela toda, porque é dela e não do documento. */
+.casca {
+  position: relative; isolation: isolate; overflow: hidden;
+  height: 100vh; min-height: 640px;
+  display: grid;
+  grid-template-columns: 244px minmax(0, 1fr);
+  grid-template-rows: 60px 40px minmax(0, 1fr) 28px;
+  grid-template-areas:
+    "lateral barra"
+    "lateral separadores"
+    "lateral area"
+    "estado  estado";
+  background: var(--c-fundo);
+  color: var(--c-texto);
+  font-size: var(--t-sm);
+}
+
+/* ---------- a barra lateral (06 §2) ----------
+   O azul é o de fundo, que não muda com o tema: o menu e o ecrã de entrada
+   são a mesma cor nos dois temas, senão parecem dois produtos (06 §1). */
+.lateral {
+  grid-area: lateral;
+  display: flex; flex-direction: column; min-height: 0;
+  background: var(--c-marca-fundo);
+  color: var(--c-entrada-tinta-2);
+  border-right: 1px solid rgba(255,255,255,.14);
+}
+.lateral__marca {
+  height: 60px; flex: none;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: var(--e-2) var(--e-4);
+  border-bottom: 1px solid rgba(255,255,255,.14);
+}
+.lateral__nome { margin: 0; font-family: var(--f-marca); font-size: 22px; line-height: 1; color: var(--c-entrada-tinta); }
+.lateral__sub { margin: 3px 0 0; font-size: var(--t-xs); line-height: 1.2; color: var(--c-entrada-tinta-2); }
+
+.lateral__lista { list-style: none; margin: 0; padding: var(--e-2); display: grid; gap: 2px; overflow: hidden; }
+.lateral__item {
+  position: relative;
+  display: flex; align-items: center; gap: var(--e-3);
+  padding: 7px var(--e-3); border-radius: var(--r-sm);
+  font-size: 13px; font-weight: 500; line-height: 1.4;
+  color: var(--c-entrada-tinta-2); text-decoration: none; cursor: pointer;
+}
+.lateral__item svg { width: 18px; height: 18px; flex: none; }
+.lateral__item:hover { background: rgba(255,255,255,.10); color: var(--c-entrada-tinta); }
+/* Três sinais para o ativo: fundo, peso e a marca laranja (06 §2.2) */
+.lateral__item.is-ativo { background: rgba(255,255,255,.14); color: var(--c-entrada-tinta); font-weight: 700; }
+.lateral__item.is-ativo::before {
+  content: ""; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px;
+  border-radius: 0 3px 3px 0; background: var(--c-acao-marcador);
+}
+.lateral__tecla { margin-left: auto; font-size: 11px; color: rgba(255,255,255,.5); }
+
+.lateral__pe {
+  margin-top: auto; flex: none;
+  display: flex; align-items: center; gap: var(--e-3);
+  padding: var(--e-3) var(--e-4);
+  border-top: 1px solid rgba(255,255,255,.14);
+}
+.avatar {
+  width: 36px; height: 36px; flex: none; border-radius: var(--r-full);
+  display: grid; place-items: center;
+  background: rgba(255,255,255,.16); color: var(--c-entrada-tinta);
+  font-size: var(--t-xs); font-weight: 700;
+}
+.avatar--claro { background: var(--c-marca-suave); color: var(--c-marca); }
+.lateral__quem { margin: 0; font-size: 13px; font-weight: 700; color: var(--c-entrada-tinta); line-height: 1.3; }
+.lateral__funcao { margin: 0; font-size: var(--t-xs); line-height: 1.3; }
+
+/* ---------- a barra superior (06 §3) ---------- */
+.barra {
+  grid-area: barra;
+  display: flex; align-items: center; gap: var(--e-4);
+  padding: 0 var(--e-5);
+  background: var(--c-superficie);
+  border-bottom: 1px solid var(--c-borda);
+}
+.barra__menu, .barra__icone {
+  display: grid; place-items: center; width: 34px; height: 34px; flex: none;
+  border: 0; border-radius: var(--r-sm); background: transparent; color: var(--c-texto-2); cursor: pointer;
+}
+.barra__menu:hover, .barra__icone:hover { background: var(--c-superficie-3); color: var(--c-texto); }
+.barra__menu svg, .barra__icone svg { width: 20px; height: 20px; }
+.barra__icone { position: relative; }
+.barra__contador {
+  position: absolute; top: 3px; right: 2px; min-width: 16px; height: 16px; padding: 0 4px;
+  border-radius: var(--r-full); background: var(--c-erro); color: #fff;
+  font-size: 10px; font-weight: 700; line-height: 16px; text-align: center;
+}
+
+/* A procura abre qualquer ecrã do menu pelo nome. Com 326 itens em quinze
+   menus, é por aqui que entra quem já sabe o que quer. */
+.procura {
+  flex: 0 1 420px;
+  display: flex; align-items: center; gap: var(--e-2);
+  height: 36px; padding: 0 var(--e-3);
+  background: var(--c-superficie-2); border: 1px solid var(--c-borda); border-radius: var(--r-md);
+  color: var(--c-texto-3);
+}
+.procura svg { width: 16px; height: 16px; flex: none; }
+.procura__texto { flex: 1; margin: 0; font-size: var(--t-sm); }
+.kbd {
+  display: inline-block; padding: 1px 6px; border-radius: 4px;
+  border: 1px solid var(--c-borda-forte); background: var(--c-superficie);
+  font-family: var(--f-base); font-size: 11px; font-weight: 600; color: var(--c-texto-2); line-height: 1.5;
+}
+.barra__espaco { flex: 1; }
+
+/* A empresa ativa. Está aqui e na barra de estado: v10 §6.9 pede-a
+   sempre à vista, e é também por aqui que se troca. */
+.empresa {
+  display: inline-flex; align-items: center; gap: var(--e-2);
+  height: 36px; padding: 0 var(--e-3) 0 var(--e-2);
+  font: inherit; font-size: var(--t-sm); font-weight: 700; color: var(--c-texto);
+  background: var(--c-marca-suave); border: 1px solid transparent; border-radius: var(--r-md);
+  cursor: pointer;
+}
+.empresa:hover { border-color: var(--c-marca); }
+.empresa__icone { width: 26px; height: 26px; display: grid; place-items: center; border-radius: var(--r-sm); background: var(--c-marca-fundo); color: #fff; }
+.empresa__icone svg { width: 16px; height: 16px; }
+.empresa__seta { width: 14px; height: 14px; color: var(--c-texto-2); }
+
+.barra__sair {
+  display: inline-flex; align-items: center; gap: var(--e-2);
+  height: 34px; padding: 0 var(--e-3);
+  font: inherit; font-size: var(--t-sm); font-weight: 600; color: var(--c-texto-2);
+  background: transparent; border: 1px solid var(--c-borda-forte); border-radius: var(--r-md); cursor: pointer;
+}
+.barra__sair svg { width: 16px; height: 16px; }
+
+/* ---------- os separadores ----------
+   Abrir um ecrã já aberto ativa o separador que existe, em vez de o
+   duplicar (v10 §6.9). O Início está sempre lá e não fecha. */
+.separadores {
+  grid-area: separadores;
+  display: flex; align-items: flex-end; gap: 2px;
+  padding: 0 var(--e-4);
+  background: var(--c-superficie-2);
+  border-bottom: 1px solid var(--c-borda);
+}
+.separador-doc {
+  position: relative;
+  display: inline-flex; align-items: center; gap: var(--e-2);
+  height: 34px; max-width: 240px; padding: 0 var(--e-2) 0 var(--e-3);
+  font-size: var(--t-sm); color: var(--c-texto-2);
+  border: 1px solid transparent; border-bottom: 0; border-radius: var(--r-sm) var(--r-sm) 0 0;
+  white-space: nowrap; cursor: pointer;
+}
+.separador-doc svg { width: 15px; height: 15px; flex: none; }
+.separador-doc:hover { background: var(--c-superficie-3); }
+.separador-doc.is-ativo {
+  background: var(--c-fundo); color: var(--c-texto); font-weight: 700;
+  border-color: var(--c-borda); margin-bottom: -1px; height: 35px;
+}
+.separador-doc.is-ativo::before {
+  content: ""; position: absolute; left: -1px; right: -1px; top: -1px; height: 2px;
+  border-radius: var(--r-sm) var(--r-sm) 0 0; background: var(--c-acao-marcador);
+}
+.separador-doc__texto { overflow: hidden; text-overflow: ellipsis; }
+.separador-doc__fechar {
+  display: grid; place-items: center; width: 20px; height: 20px; flex: none;
+  border-radius: 4px; color: var(--c-texto-3); font-size: 14px; line-height: 1;
+}
+.separador-doc__fechar:hover { background: var(--c-borda); color: var(--c-texto); }
+/* por gravar: o ponto ocupa o lugar do × até se passar por cima */
+.separador-doc__ponto { width: 8px; height: 8px; border-radius: var(--r-full); background: var(--c-acao); flex: none; margin: 0 6px; }
+
+/* ---------- a área do documento ---------- */
+.area { grid-area: area; position: relative; min-height: 0; overflow: hidden; }
+.pagina { height: 100%; overflow: hidden; padding: var(--e-5) var(--e-6); display: flex; flex-direction: column; gap: var(--e-4); }
+
+.pagina__cabeca { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--e-4); }
+.pagina__titulo { margin: 0; font-size: var(--t-2xl); line-height: 1.2; display: flex; align-items: center; gap: var(--e-3); }
+.pagina__sub { margin: 2px 0 0; font-size: var(--t-sm); color: var(--c-texto-2); }
+.pagina__accoes { display: flex; align-items: center; gap: var(--e-2); flex: none; }
+.pagina__dica { margin: 6px 0 0; font-size: var(--t-xs); color: var(--c-texto-2); text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
+.pagina__dica svg { width: 13px; height: 13px; }
+
+.grelha-2 { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--e-4); align-items: start; }
+.grelha-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--e-4); }
+
+/* ---------- cartão (05 §4) ---------- */
+.bloco {
+  background: var(--c-superficie); border: 1px solid var(--c-borda); border-radius: var(--r-lg);
+  box-shadow: var(--s-1);
+}
+.bloco__cabeca {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--e-3);
+  padding: var(--e-3) var(--e-4); border-bottom: 1px solid var(--c-borda);
+}
+.bloco__titulo { margin: 0; font-family: var(--f-titulo); font-size: var(--t-md); font-weight: 600; }
+.bloco__corpo { padding: var(--e-4); }
+.bloco__corpo--sem { padding: 0; }
+.bloco__nota { margin: 0; font-size: var(--t-xs); color: var(--c-texto-2); }
+
+/* lista de destinos dentro de um cartão: recentes, atalhos */
+.lista { list-style: none; margin: 0; padding: var(--e-1) 0; }
+.lista__item {
+  display: flex; align-items: center; gap: var(--e-3);
+  padding: var(--e-2) var(--e-4); cursor: pointer;
+}
+.lista__item:hover { background: var(--c-superficie-2); }
+.lista__icone { width: 32px; height: 32px; flex: none; display: grid; place-items: center; border-radius: var(--r-sm); background: var(--c-marca-suave); color: var(--c-marca); }
+.lista__icone svg { width: 17px; height: 17px; }
+.lista__texto { flex: 1; min-width: 0; }
+.lista__titulo { margin: 0; font-weight: 700; line-height: 1.35; }
+.lista__sub { margin: 0; font-size: var(--t-xs); color: var(--c-texto-2); line-height: 1.35; }
+.lista__quando { font-size: var(--t-xs); color: var(--c-texto-3); white-space: nowrap; }
+
+.atalhos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--e-3); padding: var(--e-4); }
+.atalho {
+  display: flex; flex-direction: column; gap: var(--e-2);
+  padding: var(--e-3); border: 1px solid var(--c-borda); border-radius: var(--r-md);
+  background: var(--c-superficie-2); cursor: pointer;
+}
+.atalho:hover { border-color: var(--c-marca); }
+.atalho svg { width: 20px; height: 20px; color: var(--c-marca); }
+.atalho__nome { margin: 0; font-weight: 700; line-height: 1.3; }
+.atalho__onde { margin: 0; font-size: var(--t-xs); color: var(--c-texto-2); }
+
+.vazio { padding: var(--e-6) var(--e-4); text-align: center; color: var(--c-texto-2); }
+.vazio svg { width: 32px; height: 32px; color: var(--c-texto-3); margin-bottom: var(--e-2); }
+.vazio__titulo { margin: 0 0 var(--e-1); font-weight: 700; color: var(--c-texto); }
+.vazio__sub { margin: 0; font-size: var(--t-sm); }
+
+/* progresso (14 §5) */
+.progresso { height: 8px; border-radius: var(--r-full); background: var(--c-superficie-3); overflow: hidden; }
+.progresso__barra { height: 100%; border-radius: inherit; background: var(--c-marca); }
+.progresso--cheio .progresso__barra { background: var(--c-aviso); }
+
+/* ---------- selo (14 §2) ---------- */
+.selo {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 1px var(--e-2); border-radius: var(--r-full);
+  font-size: var(--t-xs); font-weight: 700; line-height: 1.6; white-space: nowrap;
+  background: var(--c-superficie-3); color: var(--c-texto-2);
+}
+.selo::before { content: ""; width: 6px; height: 6px; border-radius: var(--r-full); background: currentColor; }
+.selo--ok     { background: var(--c-ok-suave); color: var(--c-ok); }
+.selo--aviso  { background: var(--c-aviso-suave); color: var(--c-aviso); }
+.selo--erro   { background: var(--c-erro-suave); color: var(--c-erro); }
+.selo--info   { background: var(--c-marca-suave); color: var(--c-marca); }
+.selo--acao   { background: var(--c-acao-suave); color: var(--c-acao-traco); }
+.selo--sem-ponto::before { display: none; }
+
+/* ---------- filtros por cima da tabela ---------- */
+.filtros { display: flex; align-items: center; gap: var(--e-2); }
+.filtros .campo--icone { flex: 0 1 380px; }
+.filtros .input { min-height: 38px; }
+.filtros select.input { width: auto; min-width: 160px; }
+.filtros__total { margin-left: auto; font-size: var(--t-xs); color: var(--c-texto-2); }
+
+/* ---------- tabela (11) ---------- */
+.tabela-caixa { background: var(--c-superficie); border: 1px solid var(--c-borda); border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--s-1); }
+.tabela { width: 100%; border-collapse: collapse; font-size: var(--t-sm); }
+.tabela th {
+  text-align: left; font-size: var(--t-xs); font-weight: 700; color: var(--c-texto-2);
+  text-transform: uppercase; letter-spacing: .04em;
+  padding: 10px var(--e-4); background: var(--c-superficie-2); border-bottom: 1px solid var(--c-borda);
+  white-space: nowrap;
+}
+.tabela td { padding: 10px var(--e-4); border-bottom: 1px solid var(--c-borda); vertical-align: middle; }
+.tabela tbody tr:last-child td { border-bottom: 0; }
+.tabela tbody tr { cursor: pointer; }
+.tabela tbody tr:hover td { background: var(--c-superficie-2); }
+.tabela .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tabela .centro { text-align: center; }
+.tabela .forte { font-weight: 700; }
+.tabela .discreto { color: var(--c-texto-2); }
+.tabela .mono { font-family: var(--f-mono); font-size: var(--t-xs); color: var(--c-texto-2); }
+.tabela__linha--marcada td { background: var(--c-marca-suave); }
+.tabela__rodape {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--e-3);
+  padding: var(--e-2) var(--e-4); border-top: 1px solid var(--c-borda);
+  font-size: var(--t-xs); color: var(--c-texto-2); background: var(--c-superficie);
+}
+.paginas { display: flex; gap: var(--e-1); }
+.paginas span {
+  min-width: 28px; height: 28px; display: grid; place-items: center; padding: 0 6px;
+  border-radius: var(--r-sm); border: 1px solid var(--c-borda); color: var(--c-texto);
+}
+.paginas .is-atual { background: var(--c-marca-fundo); border-color: transparent; color: #fff; font-weight: 700; }
+
+/* ---------- o documento ---------- */
+.ficha { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--e-3) var(--e-4); }
+.ficha__campo { margin: 0; }
+.ficha__campo--2 { grid-column: span 2; }
+.ficha__rotulo { display: block; font-size: var(--t-xs); font-weight: 600; color: var(--c-texto-2); margin-bottom: 2px; }
+.ficha__valor {
+  display: block; min-height: 38px; padding: 8px var(--e-3);
+  background: var(--c-superficie); border: 1px solid var(--c-borda-forte); border-radius: var(--r-md);
+  line-height: 1.4;
+}
+.ficha__valor small { color: var(--c-texto-2); }
+.totais { display: grid; grid-template-columns: auto auto; justify-content: end; gap: 4px var(--e-6); padding: var(--e-3) var(--e-4); border-top: 1px solid var(--c-borda); font-size: var(--t-sm); }
+.totais dt { color: var(--c-texto-2); text-align: right; }
+.totais dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.totais .totais__grande { font-size: var(--t-lg); font-weight: 700; color: var(--c-texto); }
+
+/* botão desligado com cadeado: não tem a permissão da ação (v10 §4.20) */
+.btn--cadeado { opacity: .55; cursor: not-allowed; }
+.btn--cadeado:hover { background: var(--c-superficie-2); }
+
+/* ---------- faixa de aviso dentro da área ---------- */
+.faixa {
+  display: flex; align-items: center; gap: var(--e-3);
+  padding: var(--e-3) var(--e-4);
+  border-radius: var(--r-md); border-left: 3px solid var(--c-erro);
+  background: var(--c-erro-suave); color: var(--c-texto); font-size: var(--t-sm);
+}
+.faixa svg { width: 20px; height: 20px; flex: none; color: var(--c-erro); }
+.faixa__texto { flex: 1; margin: 0; }
+.faixa__texto > b { display: block; }
+.faixa--aviso { background: var(--c-aviso-suave); border-left-color: var(--c-aviso); }
+.faixa--aviso svg { color: var(--c-aviso); }
+.faixa--info { background: var(--c-marca-suave); border-left-color: var(--c-marca); }
+.faixa--info svg { color: var(--c-marca); }
+
+/* ---------- o menu de uma área, por cima da área ----------
+   06 §5.3 tira os submenus de dentro da barra lateral. Os 326 itens do
+   ERP abrem-se então num painel ao lado, um menu de topo de cada vez. */
+.voo {
+  position: absolute; top: 0; bottom: 0; left: 0; z-index: 5;
+  width: 320px; display: flex; flex-direction: column;
+  background: var(--c-superficie); border-right: 1px solid var(--c-borda);
+  box-shadow: var(--s-3);
+}
+.voo__cabeca { display: flex; align-items: center; gap: var(--e-2); padding: var(--e-4) var(--e-4) var(--e-2); }
+.voo__titulo { margin: 0; font-family: var(--f-titulo); font-size: var(--t-lg); font-weight: 600; flex: 1; }
+.voo__filtro { padding: 0 var(--e-4) var(--e-3); }
+.voo__filtro .input { min-height: 36px; }
+.voo__corpo { flex: 1; overflow: hidden; padding: 0 var(--e-2) var(--e-3); }
+.voo__grupo { margin: var(--e-2) 0 var(--e-1); padding: 0 var(--e-2); font-size: 11px; font-weight: 700; color: var(--c-texto-3); text-transform: uppercase; letter-spacing: .06em; }
+.voo__item {
+  display: flex; align-items: center; gap: var(--e-2);
+  padding: 6px var(--e-2); border-radius: var(--r-sm);
+  font-size: var(--t-sm); color: var(--c-texto); cursor: pointer;
+}
+.voo__item:hover { background: var(--c-superficie-2); }
+.voo__item u { text-decoration-color: var(--c-texto-3); text-underline-offset: 2px; }
+.voo__item .selo { margin-left: auto; }
+/* Por converter: está no menu porque o menu completo é o mapa da migração
+   (v10 §6.9), mas ainda não abre. */
+.voo__item--por-converter { color: var(--c-texto-3); cursor: default; }
+.voo__item--por-converter:hover { background: transparent; }
+.voo__pe { padding: var(--e-3) var(--e-4); border-top: 1px solid var(--c-borda); }
+.voo__veu { position: absolute; inset: 0; z-index: 4; background: rgba(34,36,40,.18); }
+
+/* ---------- a barra de estado ----------
+   v10 §6.9: o utilizador, o ponto de venda, o indicador de ligação e o
+   servidor. A empresa vai à frente, ao lado do utilizador. O 05 §5.4 diz
+   «sem rodapé» para o painel web; aqui manda a v10 — ver LEIA-ME. */
+.estado {
+  grid-area: estado;
+  display: flex; align-items: center; gap: 0;
+  padding: 0 var(--e-3);
+  background: var(--c-superficie-3); color: var(--c-texto-2);
+  border-top: 1px solid var(--c-borda);
+  font-size: 12px; white-space: nowrap;
+}
+.estado__item { display: inline-flex; align-items: center; gap: 6px; padding: 0 var(--e-3); height: 100%; }
+.estado__item + .estado__item { border-left: 1px solid var(--c-borda); }
+.estado__item svg { width: 13px; height: 13px; }
+.estado__item--empresa { color: var(--c-texto); font-weight: 700; }
+.estado__espaco { flex: 1; }
+.estado__luz { width: 8px; height: 8px; border-radius: var(--r-full); background: var(--c-ok); }
+.estado__item--sem-ligacao { color: var(--c-erro); font-weight: 700; }
+.estado__item--sem-ligacao .estado__luz { background: var(--c-erro); }
+
+/* ---------- janela por cima da casca (13 §2) ----------
+   Não é um <dialog>: o editor tem de a ver e escolher como as outras peças. */
+.casca__veu { position: absolute; inset: 0; z-index: 20; background: rgba(34,36,40,.45); display: grid; place-items: center; }
+[data-theme="dark"] .casca__veu { background: rgba(0,0,0,.6); }
+.janela {
+  width: 520px; border-radius: var(--r-lg);
+  background: var(--c-superficie); color: var(--c-texto); box-shadow: var(--s-3);
+}
+.janela .modal__corpo { max-height: none; }
+.escolhas { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--e-2); }
+.escolha {
+  display: flex; align-items: center; gap: var(--e-3);
+  padding: var(--e-3); border: 1px solid var(--c-borda); border-radius: var(--r-md);
+  cursor: pointer; background: var(--c-superficie);
+}
+.escolha:hover { border-color: var(--c-marca); }
+.escolha.is-escolhida { border-color: var(--c-marca); box-shadow: 0 0 0 3px var(--c-marca-suave); }
+.escolha.is-atual { background: var(--c-superficie-2); cursor: default; }
+.escolha__icone { width: 36px; height: 36px; flex: none; display: grid; place-items: center; border-radius: var(--r-sm); background: var(--c-marca-suave); color: var(--c-marca); }
+.escolha__icone svg { width: 18px; height: 18px; }
+.escolha__texto { flex: 1; min-width: 0; }
+.escolha__nome { margin: 0; font-weight: 700; line-height: 1.35; }
+.escolha__sub { margin: 0; font-size: var(--t-xs); color: var(--c-texto-2); line-height: 1.35; }
+.escolha__seta { width: 18px; height: 18px; color: var(--c-texto-3); flex: none; }
+.radio { width: 18px; height: 18px; flex: none; border-radius: var(--r-full); border: 2px solid var(--c-borda-forte); }
+.is-escolhida .radio { border: 5px solid var(--c-marca); }
+
+.fecham { margin: 0; padding: 0 0 0 var(--e-5); font-size: var(--t-sm); }
+.fecham li { margin: 2px 0; }
+.fecham b { color: var(--c-acao-traco); }
+
+/* notificação dentro da casca: na tela não há janela para a fixar */
+.casca .toasts { position: absolute; bottom: calc(28px + var(--e-5)); z-index: 30; }
+
+/* ---------- administração (v10 §4.21) ---------- */
+.lugar { padding: var(--e-4); display: grid; gap: var(--e-2); }
+.lugar__cabeca { display: flex; align-items: baseline; justify-content: space-between; gap: var(--e-2); }
+.lugar__modulo { margin: 0; font-weight: 700; }
+.lugar__codigo { font-family: var(--f-mono); font-size: var(--t-xs); color: var(--c-texto-3); font-weight: 400; margin-left: 4px; }
+.lugar__conta { margin: 0; font-family: var(--f-titulo); font-size: var(--t-xl); font-weight: 600; line-height: 1; }
+.lugar__conta small { font-size: var(--t-sm); color: var(--c-texto-2); font-weight: 400; }
+.lugar__nota { margin: 0; font-size: var(--t-xs); color: var(--c-texto-2); }
+
+.fichas-mod { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+.ficha-mod {
+  display: inline-block; padding: 0 6px; border-radius: 4px;
+  font-family: var(--f-mono); font-size: 11px; font-weight: 700; line-height: 18px;
+  background: var(--c-marca-suave); color: var(--c-marca);
+}
+.ficha-mod--sem { background: var(--c-aviso-suave); color: var(--c-aviso); text-decoration: line-through; }
+
+.passos { display: flex; align-items: center; gap: var(--e-3); margin: 0; padding: 0; list-style: none; font-size: var(--t-sm); }
+.passo { display: inline-flex; align-items: center; gap: var(--e-2); color: var(--c-texto-2); }
+.passo__n { width: 24px; height: 24px; border-radius: var(--r-full); display: grid; place-items: center; font-size: var(--t-xs); font-weight: 700; border: 2px solid var(--c-borda-forte); }
+.passo.is-atual { color: var(--c-texto); font-weight: 700; }
+.passo.is-atual .passo__n { background: var(--c-marca-fundo); border-color: transparent; color: #fff; }
+.passo.is-feito .passo__n { background: var(--c-ok-suave); border-color: transparent; color: var(--c-ok); }
+.passos__risco { width: 40px; height: 2px; background: var(--c-borda-forte); }
+
+.modulos { display: grid; gap: var(--e-2); }
+.modulo {
+  display: grid; grid-template-columns: 22px minmax(0, 1fr) 220px; align-items: center; gap: var(--e-3);
+  padding: var(--e-3) var(--e-4); border: 1px solid var(--c-borda); border-radius: var(--r-md); background: var(--c-superficie);
+}
+.modulo.is-marcado { border-color: var(--c-marca); background: var(--c-marca-suave); }
+.modulo.is-cheio { background: var(--c-superficie-2); }
+.modulo input { width: 18px; height: 18px; accent-color: var(--c-marca-fundo); margin: 0; }
+.modulo__nome { margin: 0; font-weight: 700; }
+.modulo__sub { margin: 0; font-size: var(--t-xs); color: var(--c-texto-2); }
+.modulo__conta { display: grid; gap: 4px; font-size: var(--t-xs); color: var(--c-texto-2); text-align: right; }
+.modulo .faixa { grid-column: 2 / -1; margin-top: var(--e-1); }
+
+.segmentos { display: inline-flex; border: 1px solid var(--c-borda-forte); border-radius: var(--r-md); overflow: hidden; }
+.segmento { padding: 7px var(--e-4); font-size: var(--t-sm); font-weight: 600; color: var(--c-texto-2); background: var(--c-superficie); cursor: pointer; }
+.segmento + .segmento { border-left: 1px solid var(--c-borda-forte); }
+.segmento.is-atual { background: var(--c-marca-fundo); color: #fff; }
+
+.permissoes th.centro, .permissoes td.centro { width: 84px; }
+.permissoes input { width: 16px; height: 16px; accent-color: var(--c-marca-fundo); margin: 0; vertical-align: middle; }
+.permissoes td { padding-top: 8px; padding-bottom: 8px; }
+.permissoes .mono { margin-left: var(--e-2); }
+.permissoes .area-linha td { background: var(--c-superficie-2); font-weight: 700; font-size: var(--t-xs); text-transform: uppercase; letter-spacing: .04em; color: var(--c-texto-2); padding-top: 6px; padding-bottom: 6px; cursor: default; }
+.permissoes .nao-ha { color: var(--c-texto-3); }
+.permissoes tbody tr:hover td { background: inherit; }
+
+.barra-accoes {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--e-3);
+  margin-top: auto; padding-top: var(--e-3); border-top: 1px solid var(--c-borda);
+}
+.barra-accoes__nota { margin: 0; font-size: var(--t-xs); color: var(--c-texto-2); }
+
+/* Ícone dentro de um botão pequeno ou fantasma */
+.btn svg { width: 16px; height: 16px; flex: none; }
+
+@media print {
+  .casca { height: 900px; }
+}

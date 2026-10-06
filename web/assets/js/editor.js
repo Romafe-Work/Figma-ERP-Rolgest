@@ -472,9 +472,10 @@
   }
 
   function trocarEcra(nome) {
-    var ecras = document.querySelectorAll('.ecra');
-    for (var i = 0; i < ecras.length; i++) {
-      ecras[i].hidden = ecras[i].dataset.ecra !== nome;
+    if (window.RolgestEcras) window.RolgestEcras.mostrar(nome);
+    else {
+      var ecras = document.querySelectorAll('.ecra');
+      for (var i = 0; i < ecras.length; i++) ecras[i].hidden = ecras[i].dataset.ecra !== nome;
     }
     seleccionar(null);
     construirCamadas();
@@ -549,11 +550,29 @@
 
     if (!seleccionado) {
       if (alvoEl) alvoEl.textContent = '—';
-      corpoProps.appendChild(el('p', 'ed-vazio', 'Clica numa peça do ecrã, ou escolhe-a nas camadas à esquerda.'));
+      corpoProps.appendChild(el('p', 'ed-vazio', emFluxo()
+        ? 'No mapa não se edita. Clica num ecrã para o abrir, ou volta a «Ecrãs» em baixo do seletor.'
+        : 'Clica numa peça do ecrã, ou escolhe-a nas camadas à esquerda.'));
       return;
     }
 
     if (alvoEl) alvoEl.textContent = nomeDe(seleccionado);
+
+    /* --- para onde leva, no protótipo e no mapa --- */
+    var comLigacao = seleccionado.closest('[data-ir]');
+    if (comLigacao) {
+      var destinoEl = document.querySelector('.ecra[data-ecra="' + comLigacao.dataset.ir + '"]');
+      var sl = seccao('Leva a');
+      sl.appendChild(el('p', 'ed-dica', destinoEl ? (destinoEl.dataset.nome || comLigacao.dataset.ir) : 'Ecrã que não existe: ' + comLigacao.dataset.ir));
+      if (comLigacao.hasAttribute('data-sem-seta')) sl.appendChild(el('p', 'ed-dica', 'Repete-se em todos os ecrãs, por isso não tem seta no mapa.'));
+      if (destinoEl) {
+        var bIr = el('button', 'ed-botao', 'Ir para lá');
+        bIr.type = 'button';
+        bIr.addEventListener('click', function () { window.RolgestEditor.irPara(comLigacao.dataset.ir); });
+        sl.appendChild(bIr);
+      }
+      corpoProps.appendChild(sl);
+    }
 
     /* --- variante, só para botões (09 §2) --- */
     if (seleccionado.classList.contains('btn')) {
@@ -1009,16 +1028,37 @@
     var barraEcras = el('div', 'ed-ecras');
     barraEcras.appendChild(el('label', null, 'Ecrã'));
     var selEcras = el('select', 'ed-select');
+    /* agrupados pelo fluxo a que pertencem, como no mapa */
     var ecras = document.querySelectorAll('.ecra');
+    var grupo = null;
     for (var i = 0; i < ecras.length; i++) {
+      var fl = ecras[i].dataset.fluxo || '';
+      if (!grupo || grupo.label !== fl) {
+        grupo = el('optgroup');
+        grupo.label = fl;
+        selEcras.appendChild(grupo);
+      }
       var o = el('option', null, ecras[i].dataset.nome || ecras[i].dataset.ecra);
       o.value = ecras[i].dataset.ecra;
       if (!ecras[i].hidden) o.selected = true;
-      selEcras.appendChild(o);
+      grupo.appendChild(o);
     }
     selEcras.addEventListener('change', function () { trocarEcra(selEcras.value); });
     barraEcras.appendChild(selEcras);
     painelEsq.appendChild(barraEcras);
+
+    /* Um ecrã de cada vez, ou o mapa com todos e as setas entre eles */
+    var vistas = el('div', 'ed-degraus ed-vistas');
+    [['ecras', 'Ecrãs'], ['fluxo', 'Fluxo']].forEach(function (par) {
+      var b = el('button', 'ed-degrau', par[1]);
+      b.type = 'button';
+      b.dataset.vista = par[0];
+      b.dataset.edDica = par[0] === 'fluxo' ? 'Todos os ecrãs, com as setas de onde cada peça leva' : 'Um ecrã de cada vez, para editar';
+      b.setAttribute('aria-pressed', String(par[0] === 'ecras'));
+      b.addEventListener('click', function () { abrirFluxo(par[0] === 'fluxo'); });
+      vistas.appendChild(b);
+    });
+    painelEsq.appendChild(vistas);
 
     listaCamadas = el('div', 'ed-corpo');
     painelEsq.appendChild(listaCamadas);
@@ -1099,6 +1139,32 @@
     document.body.appendChild(dialogo);
   }
 
+  /* ---------------- o mapa ----------------
+     No mapa a tela não se edita: os ecrãs estão a um quarto do tamanho, e
+     clicar num deles volta aos ecrãs com esse aberto. */
+  function emFluxo() { return !!(window.RolgestFluxo && window.RolgestFluxo.activo()); }
+
+  function abrirFluxo(sim) {
+    if (!window.RolgestFluxo || sim === emFluxo()) return;
+    if (sim) {
+      seleccionar(null);
+      ligado = false;
+      document.body.classList.add('ed-fluxo');
+      window.RolgestFluxo.ligar({ aoEscolher: function (nome) { abrirFluxo(false); window.RolgestEditor.irPara(nome); } });
+    } else {
+      window.RolgestFluxo.desligar();
+      document.body.classList.remove('ed-fluxo');
+      ligado = true;
+      construirCamadas();
+    }
+    var bs = painelEsq.querySelectorAll('.ed-vistas .ed-degrau');
+    for (var k = 0; k < bs.length; k++) bs[k].setAttribute('aria-pressed', String((bs[k].dataset.vista === 'fluxo') === sim));
+    var h = location.hash.replace(/^#/, '').split('&').filter(function (p) { return p && p.indexOf('doc=') !== 0; });
+    if (sim) h.unshift('doc=fluxo');
+    try { history.replaceState(null, '', h.length ? '#' + h.join('&') : location.pathname); } catch (e) {}
+    pintarProps();
+  }
+
   function abrirDialogo() {
     dialogo.codigo.textContent = cssFinal();
     dialogo.showModal();
@@ -1158,7 +1224,7 @@
     /* A tela abre em edição. A única saída é «#so=ecra», que não é um modo
        de ver: é o que o gerador fotografa, e o que se mostra numa reunião
        sem ter a moldura do editor pelo meio. */
-    if (/(^|[#&])so=ecra\b/.test(location.hash)) return;
+    if (/(^|[#&])so=(ecra|fluxo)\b/.test(location.hash)) return;
 
     ligado = true;
     document.body.classList.add('editando');
@@ -1197,13 +1263,16 @@
       });
     }, true);
 
-    window.RomafeEditor = {
+    window.RomafeEditor = window.RolgestEditor = {
       irPara: function (nome) {
+        if (emFluxo()) abrirFluxo(false);
         var picker = painelEsq && painelEsq.querySelector('.ed-ecras select');
         if (picker) picker.value = nome;
         trocarEcra(nome);
-      }
+      },
+      fluxo: abrirFluxo
     };
+    if (/(^|[#&])doc=fluxo\b/.test(location.hash)) abrirFluxo(true);
 
     document.addEventListener('keydown', function (ev) {
       if (!ligado) return;

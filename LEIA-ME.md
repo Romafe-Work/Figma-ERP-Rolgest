@@ -1,41 +1,74 @@
-# ROLGEST — o ecrã de entrada
+# ROLGEST — os ecrãs e o fluxo
 
-O primeiro ecrã da plataforma que substitui o ERP em Delphi, desenhado numa
-tela como a do `Figma-PDA-Armazem`: o mesmo editor, apontado ao ERP.
+Os ecrãs da plataforma que substitui o ERP em Delphi, desenhados numa tela
+como a do `Figma-PDA-Armazem`: o mesmo editor, apontado ao ERP. São 13, em
+quatro fluxos, e o mapa de navegação desenha as setas entre eles.
 
 | Ficheiro | Para quê |
 | --- | --- |
-| `importar/01-ecra-entrada.png` | O ecrã a 1440×900, para ver e para colar numa apresentação |
-| `importar/01-ecra-entrada.pdf` | **Importar no Canva ou no Figma.** O mesmo, em vetor e com o texto editável |
-| `importar/gerar.sh` | Gera os dois a partir do HTML. Mudar um token ou um texto e voltar a correr |
+| `importar/00-fluxo.png` | O mapa de navegação: os ecrãs todos, uma linha por fluxo, com as setas |
+| `importar/NN-<ecrã>.png` | Cada ecrã a 1440×900, para ver e para colar numa apresentação |
+| `importar/NN-<ecrã>.pdf` | **Importar no Canva ou no Figma.** O mesmo, em vetor e com o texto editável |
+| `importar/gerar.sh` | Gera tudo a partir do HTML. Mudar um token ou um texto e voltar a correr |
+
+## O fluxo
+
+| Fluxo | Ecrãs | O que decide |
+| --- | --- | --- |
+| Entrar | 01 Entrar → 02 Escolher a empresa · 03 Aplicação fora do contrato | Primeiro quem é a pessoa, depois a empresa. Com uma só empresa, o 02 salta-se. O 03 é a recusa à porta de v10 §4.11, com código para o apoio |
+| Trabalhar numa empresa | 04 Início → 05 O menu de Vendas → 06 Encomendas de clientes → 07 Uma encomenda · 08 Sem ligação | A casca de v10 §6.9: os quinze menus de topo com a grafia antiga, separadores, e a empresa sempre à vista (na barra e no rodapé) |
+| Trocar de empresa | 07 → 09 Trocar de empresa → 10 Depois da troca | Troca-se sem sair; fecha tudo o que estava aberto e diz antes o que se perde (v10 §4.16) |
+| Dar acesso a uma pessoa | 04 → 11 Pessoas e lugares → 12 Dar lugares → 13 Permissões por empresa | Primeiro o lugar, depois as permissões, como um percurso (v10 §4.21). Um módulo cheio recusa no 12 |
+
+O 03 e o 08 não têm seta a entrar: são estados (a licença recusou, a rede
+caiu), e não um sítio aonde se vá por um botão.
+
+## Como se mexe
+
+Abre `web/index.html`. A página **abre em modo de edição**: camadas à
+esquerda, tela ao centro, propriedades à direita. O seletor de ecrã está
+agrupado por fluxo, e por baixo dele há **Ecrãs | Fluxo**.
+
+- **Fluxo** mostra o mapa. Clicar num ecrã abre-o para editar. Ctrl + roda
+  faz zoom.
+- As setas saem de qualquer peça com `data-ir="<ecrã>"`. Mudar o atributo no
+  HTML muda a seta. As peças que se repetem em todos os ecrãs (a empresa na
+  barra, o separador Início) levam também `data-sem-seta`: navegam, mas não
+  se desenham.
+- No painel de propriedades, uma peça com ligação mostra **Leva a** e o botão
+  *Ir para lá*.
+- Acrescentar um ecrã é acrescentar um `<div class="ecra" data-ecra="…"
+  data-nome="NN · …" data-fluxo="…" data-objetivo="…" hidden>`. Um fluxo novo
+  ganha a sua descrição no `<template id="fluxos">`.
+
+Endereços: `#ecra=menu` abre nesse ecrã; `#so=ecra&ecra=menu` mostra-o sem a
+moldura, e aí os botões funcionam como protótipo, de ecrã em ecrã;
+`#so=fluxo` é só o mapa; `#doc=fluxo` é o editor já no mapa.
 
 ## O código: `web/`
 
 ```
 web/
-  index.html                  o ecrã, em modo de edição
+  index.html                  os ecrãs, em modo de edição
   documentacao.html           o sistema documentado, com exemplos vivos
   como-funciona.html          o que isto é e porque não é o Figma
   assets/css/tokens.css       os valores do manual de UI da Romafe, sem alterar
   assets/css/base.css         botão, campo, opção, segmentado, marca
-  assets/css/entrada.css      só o layout deste ecrã
-  assets/css/editor.css       a moldura do editor
+  assets/css/entrada.css      o palco com fotografia: 01, 02 e 03
+  assets/css/casca.css        a aplicação por dentro: 04 a 13
+  assets/css/editor.css       a moldura do editor e o mapa
   assets/js/tema.js           claro, escuro, auto — a chave é 'uiux:tema'
   assets/js/entrada.js        mostrar/ocultar, e a recusa de credenciais
+  assets/js/ecras.js          qual ecrã se vê, e o protótipo fora do editor
+  assets/js/fluxo.js          o mapa de navegação e as setas
   assets/js/editor.js         o editor: camadas, propriedades, «Ver o CSS»
   assets/fonts/               Motor, Jost e Lato em woff2
   assets/img/armazem.png      o fundo. Sem ele fica o azul de superfície invertida
 ```
 
-Abre `web/index.html` no navegador. Não precisa de servidor nem de build.
-A página **abre em modo de edição**: camadas à esquerda, tela ao centro,
-propriedades à direita. `web/index.html#so=ecra` tira a moldura — é o que o
-gerador fotografa, e o que se mostra numa reunião.
+Não precisa de servidor nem de build.
 
-Acrescentar um ecrã é acrescentar um `<div class="ecra" data-ecra="…"
-data-nome="02 · …">` ao HTML. O seletor em cima das camadas passa a tê-lo.
-
-## O que este ecrã decide
+## O que o ecrã de entrada decide
 
 O resumo da v10 diz, em §5, que há **três perguntas e três donos**, e que
 nenhum consulta os outros: a identidade é do Keycloak, a licença é do servidor
@@ -76,3 +109,26 @@ ERP também é partilhado: o balcão, a expedição, a oficina.
   página da aplicação. Muda quem escreve o HTML; não muda o desenho.
 - **O tema escuro** ainda não está desenhado. Os tokens existem, o cartão não.
 - **O telefone do apoio** é um exemplo, e o número da versão também.
+
+## O que os ecrãs novos deixam por decidir
+
+- **A barra de estado contraria o manual.** O 05 §5.4 do manual diz «sem
+  rodapé» para o painel web; a v10 §6.9 pede a barra de estado com o
+  utilizador, o ponto de venda, a ligação e o servidor. Seguiu-se a v10.
+- **O menu abre num painel ao lado da barra**, porque o 06 §5.3 tira os
+  submenus de dentro dela. Com 326 itens, a procura (Ctrl K) é por onde
+  entra quem já sabe o nome do ecrã.
+- **«Por converter» no menu** é o mapa da migração de v10 §6.9. Se o Rolgest
+  só entra quando tudo estiver convertido (não há convivência com o Delphi),
+  este estado só existe durante o desenvolvimento.
+- **Trocar com alterações por gravar.** O 09 oferece «Fechar sem gravar e
+  trocar». A alternativa é obrigar a gravar ou descartar separador a
+  separador antes de deixar trocar.
+- **O que é exemplo:** os itens dos menus (a árvore transcrita do
+  Principal.dfm não está neste projeto), os 112 de 326 convertidos, as
+  empresas, os NIF, as pessoas, os clientes, os artigos e os números de
+  lugares. Os códigos de permissão seguem a convenção de v10 §4.20, mas os
+  nomes das áreas e dos ecrãs são inventados.
+- **Encomenda e não fatura**, de propósito: uma fatura obriga a ATCUD, SAF-T
+  e encadeamento, que a v10 ainda não trata.
+
